@@ -675,3 +675,15 @@ func BlsAggregateVerifyNoCheck(aggSignature *Sign, pubKeys []PublicKey, m string
 	buf := []byte(m)
 	return C.blsAggregateVerifyNoCheck(&aggSignature.v, &pubKeys[0].v, unsafe.Pointer(&buf[0]), C.mclSize(len(buf)), C.mclSize(n)) == 1
 }
+
+func IsSwapG() bool {
+	pk := C.blsPublicKey{}
+	v := interface{}(pk.v)
+	switch v.(type) {
+	case C.mclBnG1:
+		return true
+	case C.mclBnG2:
+		return false
+	}
+	panic("unable to determine library swap")
+}
