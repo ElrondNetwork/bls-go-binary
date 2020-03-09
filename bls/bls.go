@@ -649,3 +649,28 @@ func SetRandFunc(randReader io.Reader) {
 		C.blsSetRandFunc(nil, C.ReadRandFunc(unsafe.Pointer(nil)))
 	}
 }
+
+// BlsGetGeneratorForPublicKey
+func BlsGetGeneratorForPublicKey(pub *PublicKey) {
+	C.blsGetGeneratorOfPublicKey(&pub.v)
+}
+
+// BlsAggregateSignatures --
+func BlsAggregateSignatures(aggSignature *Sign, signatures []Sign) {
+	n := len(signatures)
+	C.blsAggregateSignature(&aggSignature.v, &signatures[0].v, C.mclSize(n))
+}
+
+// BlsFastAggregateVerify --
+func BlsFastAggregateVerify(aggSignature *Sign, pubKeys []PublicKey, m string) bool {
+	n := len(pubKeys)
+	buf := []byte(m)
+	return C.blsFastAggregateVerify(&aggSignature.v, &pubKeys[0].v, C.mclSize(n), unsafe.Pointer(&buf[0]), C.mclSize(len(buf))) == 1
+}
+
+// BlsAggregateVerifyNoCheck --
+func BlsAggregateVerifyNoCheck(aggSignature *Sign, pubKeys []PublicKey, m string) bool {
+	n := len(pubKeys)
+	buf := []byte(m)
+	return C.blsAggregateVerifyNoCheck(&aggSignature.v, &pubKeys[0].v, unsafe.Pointer(&buf[0]), C.mclSize(len(buf)), C.mclSize(n)) == 1
+}
